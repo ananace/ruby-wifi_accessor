@@ -1,0 +1,59 @@
+#!/bin/env ruby
+# frozen_string_literal: true
+
+require 'optparse'
+require 'wifi_accessor'
+
+opts = {}
+OptParse.new do |parse|
+  parse.banner = "Usage: #{$PROGRAM_NAME} [OPTIONS...] NETWORK"
+
+  parse.on '-h', '--help', 'Display this text' do
+    puts parse
+    exit
+  end
+
+  parse.on '-v', '--verbose', 'Run verbosely' do
+    opts[:verbose] = true
+  end
+
+  parse.on '-l', '--[no-]login', 'Log in' do |login|
+    opts[:login] = login
+  end
+  parse.on '-d', '--[no-]data', 'Read data amount' do |data|
+    opts[:data] = data
+  end
+end.parse!
+
+raise 'Network name is missing' unless ARGV.any?
+
+network = ARGV.first
+network = WifiAccessor.data.get(network)
+
+return unless network
+
+if opts[:login]
+  puts "Logging in..."
+  if network.login!
+    puts "Login succeeded"
+    hooks = network.hooks['login']
+    hooks&.each do |hook|
+      puts "- Running hook #{hook.inspect}"
+      system({ 'NETWORK' => network.name }, hook)
+    end
+  end
+end
+
+if opts[:data] && network.data?
+  data = network.data!
+
+  if data.avail
+    puts "Data: #{data.avail}MB available."
+  elsif data.used
+    if data.total
+      puts "Data: #{data.used}MB/#{data.total}MB used"
+    else
+      puts "Data: #{data.used}MB used"
+    end
+  end
+end

@@ -1,0 +1,21 @@
+---
+# Global configuration is set here
+_global:
+  hooks:
+    login:
+      - 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Automatically logged into $NETWORK"'
+#   data:
+#     - 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Used data: $DATA_USED / $DATA_TOTAL MB"'
+
+CaptiveNetwork:
+  # Steps necessary to finish a login
+  login:
+    # Enter the given value into the element matching the selector
+    - '#emailBox': 'email@example.com'
+    # Click the element matching the selector
+    - '#actionContinue'
+
+  # Network-specific hooks
+  hooks:
+    login:
+      - nmcli c up id "VPN Network"
