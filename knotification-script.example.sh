@@ -7,8 +7,8 @@ NETWORK=$(tail -n1 /tmp/network-connections.log | sed "s/.*'\(.*\)'.*/\1/")
 
 echo "Connected to \"$NETWORK\" at $(date)" >> /tmp/autologin.log
 
+# Need phantomjs on the path
 export PATH="~/.bin:$PATH"
-cd ~/Projects/Ruby/wifi_accessor
-bundle exec bin/wifi_autologin --login "$NETWORK" &>> /tmp/autologin.log
+wifi-autologin --login "$NETWORK" &>> /tmp/autologin.log
 
 echo >> /tmp/autologin.log
