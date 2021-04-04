@@ -5,7 +5,21 @@ _global:
     login:
       - 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Automatically logged into $NETWORK"'
 #   data:
-#     - 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Used data: $DATA_USED / $DATA_TOTAL MB"'
+#
+#     - 'echo "[$(date)] Retrieved data for $NETWORK" >> /tmp/data.log'
+#
+#     # Hooks can use if/unless to decide whether to run or not
+#     # Break can be set to mark that no other hooks should run if this one succeeds
+#     - hook: 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "Unlimited data available"'
+#       if: 'test $DATA_INFINITE -eq 1'
+#       break: true
+#
+#     - hook: 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Available data: $DATA_AVAILABLE MB"'
+#       if: 'test -n "$DATA_AVAILABLE"'
+#       unless: 'test -n "$DATA_USED -a -n "$DATA_TOTAL"'
+#
+#     - hook: 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Used data: $DATA_USED / $DATA_TOTAL MB"'
+#       if: 'test -n "$DATA_USED" -a -n "$DATA_TOTAL"'
 
 CaptiveNetwork:
   # Steps necessary to finish a login

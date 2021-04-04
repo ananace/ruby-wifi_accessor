@@ -61,4 +61,45 @@ module WifiAccessor
 
     URI(res['location'])
   end
+
+  def self.run_hooks!(hooks, env)
+    hooks&.each do |hook|
+      cmd = hook
+      if hook.is_a? Hash
+        puts "- For hook #{cmd.inspect}"
+        cmd = hook['hook']
+        
+        hook_if = hook['if']
+        if hook_if
+          print "   If #{hook_if.inspect}"
+          unless system(env, hook_if, %i[out err] => '/dev/null')
+            puts " failed, skipping."
+            next
+          else
+            puts " succeeded."
+          end
+        end
+
+        hook_unless = hook['unless']
+        if hook_unless
+          print "  Unless #{hook_unless.inspect}"
+          if system(env, hook_unless, %i[out err] => '/dev/null')
+            puts " failed, skipping."
+            next
+          else
+            puts " succeeded."
+          end
+        end
+        puts "  Running hook #{cmd.inspect}"
+      else
+        puts "- Running hook #{cmd.inspect}"
+      end
+
+      next unless system(env, cmd)
+
+      if hook.is_a? Hash
+        break if hook['final']
+      end
+    end
+  end
 end

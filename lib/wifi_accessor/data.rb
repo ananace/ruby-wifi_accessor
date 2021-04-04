@@ -12,11 +12,12 @@ module WifiAccessor
       end
 
       def infinite?
-        total.nil? && avail.nil?
+        total.nil? && @available.nil?
       end
 
       def available
-        @available || (@total - @used)
+        return @available unless @available.nil?
+        return (@total - @used) unless @total.nil? || @used.nil?
       end
     end
   end

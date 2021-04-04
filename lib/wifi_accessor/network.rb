@@ -72,7 +72,7 @@ module WifiAccessor
     end
 
     def data!
-      return unless data
+      return Data.new unless data
 
       dev = WifiAccessor.dev
       dev.visit url
@@ -97,6 +97,8 @@ module WifiAccessor
       end
 
       return Data.new(**components) unless components.nil?
+
+      Data.new
     end
   end
 end

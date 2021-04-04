@@ -36,19 +36,30 @@ if opts[:login]
   puts "Logging in..."
   if network.login!
     puts "Login succeeded"
-    hooks = network.hooks['login']
-    hooks&.each do |hook|
-      puts "- Running hook #{hook.inspect}"
-      system({ 'NETWORK' => network.name }, hook)
-    end
+
+    env = {
+      'NETWORK' => network.name
+    }
+
+    WifiAccessor.run_hooks!(network.hooks['login'], env)
   end
 end
 
 if opts[:data] && network.data?
   data = network.data!
 
-  if data.avail
-    puts "Data: #{data.avail}MB available."
+  env = {
+    'NETWORK' => network.name,
+    'DATA_INFINITE' => data.infinite? ? 1 : 0,
+    'DATA_USED' => data.used,
+    'DATA_TOTAL' => data.total,
+    'DATA_AVAILABLE' => data.available
+  }
+
+  WifiAccessor.run_hooks!(network.hooks['data'], env)
+
+  if data.available
+    puts "Data: #{data.available}MB available."
   elsif data.used
     if data.total
       puts "Data: #{data.used}MB/#{data.total}MB used"
