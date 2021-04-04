@@ -4,6 +4,9 @@ _global:
   hooks:
     login:
       - 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Automatically logged into $NETWORK"'
+
+#     - hook: 'nmcli conn up id "My VPN"'
+#       unless: 'nmcli conn show --active | grep vpn'
 #   data:
 #
 #     - 'echo "[$(date)] Retrieved data for $NETWORK" >> /tmp/data.log'

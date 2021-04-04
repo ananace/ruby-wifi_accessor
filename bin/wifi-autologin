@@ -41,7 +41,7 @@ if opts[:login]
       'NETWORK' => network.name
     }
 
-    WifiAccessor.run_hooks!(network.hooks['login'], env)
+    WifiAccessor.run_hooks!(network.hooks['login'], env, verbose: opts[:verbose])
   end
 end
 
@@ -56,7 +56,7 @@ if opts[:data] && network.data?
     'DATA_AVAILABLE' => data.available
   }
 
-  WifiAccessor.run_hooks!(network.hooks['data'], env)
+  WifiAccessor.run_hooks!(network.hooks['data'], env, verbose: opts[:verbose])
 
   if data.available
     puts "Data: #{data.available}MB available."
