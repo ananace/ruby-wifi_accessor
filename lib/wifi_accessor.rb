@@ -2,9 +2,18 @@
 
 require 'capybara'
 require 'capybara/poltergeist'
+require 'wifi_accessor/config'
 require 'wifi_accessor/data'
 require 'wifi_accessor/network'
 require 'wifi_accessor/version'
+
+Capybara.threadsafe = true
+Capybara.register_driver :poltergeist do |app|
+  Capybara::Poltergeist::Driver.new(app,
+    # logger: STDERR,
+    phantomjs_options: ['--load-images=no', '--ignore-ssl-errors=yes']
+  )
+end
 
 module WifiAccessor
   class AlreadyLoggedInError < StandardError; end
@@ -18,39 +27,15 @@ module WifiAccessor
   end
 
   def self.dev
-    @dev ||= Capybara::Session.new :poltergeist
+    @dev ||= Capybara::Session.new(:poltergeist)
   end
 
   def self.data
-    @data ||= begin
-      ret = []
-      data_path = '~/.config/wifi.yml'
-      data_path = "#{ENV['XDG_CONFIG_HOME']}/wifi.yml" if ENV['XDG_CONFIG_HOME']
-      file = Psych.load open(File.expand_path(data_path))
-      file.each do |url, data|
-        next if url == '_global'
+    @data ||= Config.load!
+  end
 
-        params = {
-          name: url
-        }.merge(data.transform_keys(&:to_sym))
-
-        if params.key?(:hooks) || file.key?('_global')
-          params[:hooks] ||= {}
-          file.dig('_global', 'hooks').each do |hook, data|
-            stored = params[:hooks][hook] ||= []
-            params[:hooks][hook] = data + stored
-          end
-        end
-
-        ret << Network.new(**params)
-      end
-      ret.instance_eval do
-        def get(name)
-          find { |n| n.name == name }
-        end
-      end
-      ret
-    end
+  def self.get(network)
+    data.get(network)
   end
 
   def self.discover!

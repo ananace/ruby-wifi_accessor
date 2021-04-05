@@ -28,21 +28,28 @@ end.parse!
 raise 'Network name is missing' unless ARGV.any?
 
 network = ARGV.first
-network = WifiAccessor.data.get(network)
+network = WifiAccessor.get(network)
 
 return unless network
 
 if opts[:login]
   puts "Logging in..."
-  if network.login!
+  begin
+    if !network.login!
+      puts "Login failed."
+      exit 1
+    end
     puts "Login succeeded"
-
-    env = {
-      'NETWORK' => network.name
-    }
-
-    WifiAccessor.run_hooks!(network.hooks['login'], env, verbose: opts[:verbose])
+  rescue WifiAccessor::AlreadyLoggedInError
+    # Already logged in, just run hooks
+    puts "Already logged in"
   end
+
+  env = {
+    'NETWORK' => network.name
+  }
+
+  WifiAccessor.run_hooks!(network.hooks['login'], env, verbose: opts[:verbose])
 end
 
 if opts[:data] && network.data?

@@ -25,7 +25,10 @@ _global:
 #       if: 'test -n "$DATA_USED" -a -n "$DATA_TOTAL"'
 
 CaptiveNetwork:
-  # Steps necessary to finish a login
+  # Will be detected automatically if not specified
+# url: 'http://some-login-page.localdomain'
+
+  # Steps necessary to finish a login, will wait for elements to appear
   login:
     # Enter the given value into the element matching the selector
     - '#emailBox': 'email@example.com'
