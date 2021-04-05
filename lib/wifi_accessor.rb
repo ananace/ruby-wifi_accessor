@@ -53,8 +53,19 @@ module WifiAccessor
 
   def self.discover!
     uri = TEST_URI.dup
-    res = Net::HTTP.start(uri.hostname, uri.port) do |http|
-      http.request(Net::HTTP::Get.new(uri))
+    res = nil
+    attempts = 0
+    loop do
+      begin
+        res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+          http.request(Net::HTTP::Get.new(uri))
+        end
+        break
+      rescue SocketError
+        raise if attempts > 4
+        attempts += 1
+        sleep 0.5
+      end
     end
 
     raise AlreadyLoggedInError if res.is_a? Net::HTTPSuccess
