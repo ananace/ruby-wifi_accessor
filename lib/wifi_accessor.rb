@@ -61,7 +61,7 @@ module WifiAccessor
           http.request(Net::HTTP::Get.new(uri))
         end
         break
-      rescue SocketError
+      rescue SocketError # getaddrinfo: Temporary failure in name resolution
         raise if attempts > 4
         attempts += 1
         sleep 0.5
