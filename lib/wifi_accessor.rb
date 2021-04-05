@@ -24,7 +24,9 @@ module WifiAccessor
   def self.data
     @data ||= begin
       ret = []
-      file = Psych.load open(File.expand_path('~/.config/wifi.yml'))
+      data_path = '~/.config/wifi.yml'
+      data_path = "#{ENV['XDG_CONFIG_HOME']}/wifi.yml" if ENV['XDG_CONFIG_HOME']
+      file = Psych.load open(File.expand_path(data_path))
       file.each do |url, data|
         next if url == '_global'
 
