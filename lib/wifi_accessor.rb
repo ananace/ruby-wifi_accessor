@@ -55,6 +55,7 @@ module WifiAccessor
     uri = TEST_URI.dup
     res = nil
     attempts = 0
+    # Attempt to discover connectivity/captive portal for 3 seconds
     loop do
       begin
         res = Net::HTTP.start(uri.hostname, uri.port) do |http|
@@ -62,7 +63,7 @@ module WifiAccessor
         end
         break
       rescue SocketError # getaddrinfo: Temporary failure in name resolution
-        raise if attempts > 4
+        raise if attempts > 5
         attempts += 1
         sleep 0.5
       end
