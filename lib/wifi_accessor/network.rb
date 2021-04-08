@@ -29,12 +29,12 @@ module WifiAccessor
       attempts = 0
       loop do
         begin
-          puts "Attempting to reach #{url}"
+          # puts "Attempting to reach #{url}"
           dev.visit url
           break
         rescue Capybara::Poltergeist::StatusFailError => ex
           raise if attempts > 5
-          puts "#{ex.class}: #{ex}"
+          # puts "#{ex.class}: #{ex}"
           attempts += 1
           sleep 0.5
         end
@@ -49,7 +49,7 @@ module WifiAccessor
                  when 'String'
                    entry
                  else
-                   puts "Found entry #{entry.inspect} (#{entry.class.inspect})"
+                   # puts "Found entry #{entry.inspect} (#{entry.class.inspect})"
                    raise 'Unknown entry in login chain'
                  end
 
