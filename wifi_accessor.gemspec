@@ -23,4 +23,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'capybara', '~> 3'
   spec.add_dependency 'poltergeist', '~> 1'
+
+  spec.add_dependency 'ruby-dbus'
 end

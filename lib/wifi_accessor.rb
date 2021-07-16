@@ -5,6 +5,7 @@ require 'capybara/poltergeist'
 require 'wifi_accessor/config'
 require 'wifi_accessor/data'
 require 'wifi_accessor/network'
+require 'wifi_accessor/network_discover'
 require 'wifi_accessor/version'
 
 Capybara.threadsafe = true
@@ -59,6 +60,12 @@ module WifiAccessor
     raise AlreadyLoggedInError if res.is_a? Net::HTTPSuccess
 
     URI(res['location'])
+  end
+
+  def self.discover_network
+    require 'wifi_accessor/network_discover'
+
+    WifiAccessor::NetworkDiscover.run
   end
 
   def self.run_hooks!(hooks, env, verbose: false **_)

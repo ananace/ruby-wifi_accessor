@@ -20,31 +20,49 @@ OptParse.new do |parse|
   parse.on '-l', '--[no-]login', 'Log in' do |login|
     opts[:login] = login
   end
+  parse.on '--[no-]hooks', 'Run hooks' do |hooks|
+    opts[:hooks] = hooks
+  end
   parse.on '-d', '--[no-]data', 'Read data amount' do |data|
     opts[:data] = data
   end
+  parse.on '-A', '--[no-]auto', 'Automatically detect WiFi network' do |auto|
+    opts[:auto] = auto
+  end
 end.parse!
 
-raise 'Network name is missing' unless ARGV.any?
+raise 'Network name is missing' if ARGV.empty? && !opts[:auto]
 
 network = ARGV.first
-network = WifiAccessor.get(network)
+if !network && opts[:auto]
+  network = WifiAccessor.discover_network
+  puts "Discovered connected network as #{network}" if network
+end
+network = WifiAccessor.get(network) if network
 
-return unless network
+unless network
+  puts 'Failed to find network'
+  exit 1
+end
 
 if opts[:login]
-  puts "Logging in..."
+  puts 'Logging in...'
   begin
-    if !network.login!
-      puts "Login failed."
+    unless network.login!
+      puts 'Login failed.'
       exit 1
     end
-    puts "Login succeeded"
+
+    puts 'Login succeeded'
   rescue WifiAccessor::AlreadyLoggedInError
     # Already logged in, just run hooks
-    puts "Already logged in"
+    puts 'Already logged in'
+    exit unless opts[:hooks]
   end
+end
 
+# Run hooks when just logged in - unless --no-hooks is set - or when --hooks is set.
+if (opts[:login] && opts[:hooks] != false) || opts[:hooks]
   env = {
     'NETWORK' => network.name
   }
