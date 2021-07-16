@@ -10,5 +10,5 @@ if which systemd-cat &> /dev/null; then
 elif which logger &> /dev/null; then
     wifi-autologin --login --auto |& logger -t wifi-autologin
 else
-    wifi-autologin --login --auto >>& /tmp/autologin.log
+    wifi-autologin --login --auto &>> /tmp/autologin.log
 fi
