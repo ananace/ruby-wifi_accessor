@@ -4,9 +4,7 @@ A system for automatically logging in to captive-portal'ed WiFi networks.
 
 ## Installation
 
-Install it as a gem or from the Git repo
-
-    $ gem install wifi_accessor
+Install it from the Git repo
 
 ## Usage
 
