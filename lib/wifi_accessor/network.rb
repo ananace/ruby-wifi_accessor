@@ -6,16 +6,20 @@ module WifiAccessor
     attr_reader :hooks
     attr_writer :url
 
-    def initialize(name:, login:, data: nil, url: nil, hooks: {}, **_)
+    def initialize(name:, login:, **params)
       @name = name
       @login = login
-      @data = data
-      @url = url
-      @hooks = hooks
+      @data = params[:data]
+      @url = params[:url]
+      @hooks = params[:hooks]
     end
 
     def data?
       !@data.nil?
+    end
+
+    def login?
+      !@login.nil?
     end
 
     def url
@@ -23,24 +27,22 @@ module WifiAccessor
     end
 
     def login!
-      return unless login
+      return unless login?
 
       dev = WifiAccessor.dev
       attempts = 0
       loop do
-        begin
-          # puts "Attempting to reach #{url}"
-          dev.visit url
-          break
-        rescue Capybara::Poltergeist::StatusFailError => ex
-          raise if attempts > 5
-          # puts "#{ex.class}: #{ex}"
-          attempts += 1
-          sleep 0.5
-        end
+        dev.visit url
+        break
+      rescue Capybara::Poltergeist::StatusFailError
+        raise if attempts > 5
+
+        attempts += 1
+        sleep 0.1
       end
 
       login.each do |entry|
+        attempts = 0
         element = nil
         loop do
           name = case entry.class.to_s
@@ -49,38 +51,29 @@ module WifiAccessor
                  when 'String'
                    entry
                  else
-                   # puts "Found entry #{entry.inspect} (#{entry.class.inspect})"
                    raise 'Unknown entry in login chain'
                  end
 
           begin
-            # puts "Searching for #{name.inspect}"
             element = dev.find name
-            # puts "Found element #{element.inspect}"
             break
           rescue Capybara::ElementNotFound
-            sleep 0.5
+            raise if attempts > 5
+
+            attempts += 1
+            sleep 0.25
           end
         end
 
         case entry.class.to_s
         when 'Hash'
           element.set entry.values.first
-          # puts "Setting #{element.inspect} to #{entry.values.first.inspect}"
         when 'String'
           element.click
-          # puts "Clicked #{element.inspect}"
         end
       end
 
-      sleep 4
-
-      begin
-        WifiAccessor.discover!
-        false
-      rescue WifiAccessor::AlreadyLoggedInError
-        true
-      end
+      true
     end
 
     def data!
@@ -92,14 +85,16 @@ module WifiAccessor
       components = {}
       data.each do |entry|
         element = nil
+        attempts = 0
         loop do
-          begin
-            name = entry.first
-            element = dev.find name
-            break
-          rescue Capybara::ElementNotFound
-            sleep 0.5
-          end
+          name = entry.first
+          element = dev.find name
+          break
+        rescue Capybara::ElementNotFound
+          raise if attempts > 5
+
+          attempts += 1
+          sleep 0.25
         end
 
         rex = Regexp.new entry.last
