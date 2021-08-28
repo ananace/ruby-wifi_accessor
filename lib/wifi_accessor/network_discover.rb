@@ -55,7 +55,10 @@ module WifiAccessor
     end
 
     def iwconfig
-      nil
+      data, ps = Open3.capture2('iwconfig')
+      return nil unless ps.success?
+
+      data.scan(/ESSID:"(.*)"/).flatten.first
     end
   end
 end
