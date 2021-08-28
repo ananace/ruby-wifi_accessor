@@ -21,6 +21,7 @@ module WifiAccessor
       disc = new
 
       network = disc.networkmanager
+      # network ||= disc.wpa_supplicant
       network ||= disc.iw
       network ||= disc.iwconfig
       network
