@@ -28,7 +28,10 @@ module WifiAccessor
   end
 
   def self.dev
-    @dev ||= Capybara::Session.new(:poltergeist)
+    @dev ||= Capybara::Session.new(:poltergeist).tap do |session|
+      # TODO: Config?
+      session.driver.timeout = 30
+    end
   end
 
   def self.data
