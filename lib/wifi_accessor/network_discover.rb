@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'open3'
+
 module DBus
   class Service
     def dig(*args)
@@ -19,6 +21,7 @@ module WifiAccessor
       disc = new
 
       network = disc.networkmanager
+      network ||= disc.iw
       network ||= disc.iwconfig
       network
     end
@@ -42,6 +45,13 @@ module WifiAccessor
         .first
     rescue LoadError
       nil
+    end
+
+    def iw
+      data, ps = Open3.capture2('iw dev')
+      return nil unless ps.success?
+
+      data.scan(/ssid (.*)/).flatten.first
     end
 
     def iwconfig
