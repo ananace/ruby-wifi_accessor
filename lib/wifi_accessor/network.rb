@@ -2,9 +2,8 @@
 
 module WifiAccessor
   class Network
-    attr_accessor :name, :login, :data
+    attr_accessor :name, :login, :data, :url
     attr_reader :hooks
-    attr_writer :url
 
     def initialize(name:, login:, **params)
       @name = name
