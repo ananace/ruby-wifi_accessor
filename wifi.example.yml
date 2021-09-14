@@ -2,6 +2,9 @@
 # Global configuration is set here
 _global:
   hooks:
+    pre-login:
+      - 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Attempting to log into ${NETWORK}..."'
+
     login:
       - 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Automatically logged into $NETWORK"'
 

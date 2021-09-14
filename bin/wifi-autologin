@@ -47,6 +47,13 @@ end
 
 if opts[:login]
   puts 'Logging in...'
+
+  env = {
+    'NETWORK' => network.name
+  }
+
+  WifiAccessor.run_hooks!(network.hooks['pre-login'], env, verbose: opts[:verbose])
+
   begin
     unless network.login!
       puts 'Login failed.'
