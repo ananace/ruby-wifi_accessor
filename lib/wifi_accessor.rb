@@ -43,21 +43,21 @@ module WifiAccessor
   end
 
   def self.discover!
-    uri = TEST_URI.dup
     res = nil
+    uri = TEST_URI.dup
     attempts = 0
     # Attempt to discover connectivity/captive portal for 3 seconds
     loop do
-      begin
-        res = Net::HTTP.start(uri.hostname, uri.port) do |http|
-          http.request(Net::HTTP::Get.new(uri))
-        end
-        break
-      rescue SocketError # getaddrinfo: Temporary failure in name resolution
-        raise if attempts > 5
-        attempts += 1
-        sleep 0.5
+      res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+        http.request(Net::HTTP::Get.new(uri))
       end
+
+      break
+    rescue SocketError # getaddrinfo: Temporary failure in name resolution
+      raise if attempts > 5
+
+      attempts += 1
+      sleep 0.5
     end
 
     raise AlreadyLoggedInError if res.is_a? Net::HTTPSuccess
@@ -79,15 +79,15 @@ module WifiAccessor
       if hook.is_a? Hash
         puts "- For hook #{cmd.inspect}"
         cmd = hook['hook']
-        
+
         hook_if = hook['if']
         if hook_if
           print "   If #{hook_if.inspect} "
-          unless system(env, hook_if, args)
-            puts "failed, skipping."
-            next
+          if system(env, hook_if, args)
+            puts 'succeeded.'
           else
-            puts "succeeded."
+            puts 'failed, skipping.'
+            next
           end
         end
 
@@ -95,10 +95,10 @@ module WifiAccessor
         if hook_unless
           print "  Unless #{hook_unless.inspect} "
           if system(env, hook_unless, args)
-            puts "failed, skipping."
+            puts 'succeeded, skipping.'
             next
           else
-            puts "succeeded."
+            puts 'failed.'
           end
         end
         puts "  Running hook #{cmd.inspect}"
@@ -107,10 +107,7 @@ module WifiAccessor
       end
 
       next unless system(env, cmd, args)
-
-      if hook.is_a? Hash
-        break if hook['final']
-      end
+      break if hook.is_a?(Hash) && hook['final']
     end
   end
 end

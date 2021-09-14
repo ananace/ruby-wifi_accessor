@@ -48,13 +48,16 @@ end
 if opts[:login]
   puts 'Logging in...'
 
-  env = {
-    'NETWORK' => network.name
-  }
-
-  WifiAccessor.run_hooks!(network.hooks['pre-login'], env, verbose: opts[:verbose])
-
   begin
+    uri = WifiAccessor.discover!
+
+    env = {
+      'NETWORK' => network.name
+    }
+
+    WifiAccessor.run_hooks!(network.hooks['pre-login'], env, verbose: opts[:verbose])
+
+    network.url = uri
     unless network.login!
       puts 'Login failed.'
       exit 1
