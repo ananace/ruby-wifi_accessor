@@ -58,8 +58,11 @@ if opts[:login]
 
     WifiAccessor.run_hooks!(network.hooks['pre-login'], env, verbose: opts[:verbose])
 
-    unless network.login!
-      puts 'Login failed.'
+    begin
+      network.login!
+    rescue StandardError => e
+      env['ERROR'] = "#{e.class}: #{e}"
+      WifiAccessor.run_hooks!(network.hooks['error'], env, verbose: opts[:verbose])
       exit 1
     end
 

@@ -31,6 +31,7 @@ module WifiAccessor
     @dev ||= Capybara::Session.new(:poltergeist).tap do |session|
       # TODO: Config?
       session.driver.timeout = 30
+      session.driver.headers = { 'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X)' }
     end
   end
 

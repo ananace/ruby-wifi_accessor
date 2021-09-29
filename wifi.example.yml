@@ -8,6 +8,9 @@ _global:
     login:
       - 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Automatically logged into $NETWORK"'
 
+    error:
+      - 'notify-send -i network-wireless-hotspot -u low -a wifi-autologin "WiFi Autologin" "Failed to log into $NETWORK, $ERROR"'
+
 #     - hook: 'nmcli conn up id "My VPN"'
 #       unless: 'nmcli conn show --active | grep vpn'
 #   data:
